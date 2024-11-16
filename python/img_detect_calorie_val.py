@@ -4,10 +4,16 @@ import sys
 import numpy as np
 from pathlib import Path
 import csv
+import pandas as pd
 
 total_label = "カロリ"
 today_label = "今日"
-pfc_label = [today_label, total_label, "たんぱく質", "脂質", "糖質"]
+csv_label = [today_label, total_label]
+pfc_label = ["たんぱく質", "脂質", "糖質"]
+
+csv_label.extend(pfc_label)
+
+resultCsv = './csv/export.csv'
 image_extensions = ('*.jpg', '*.jpeg', '*.png', '*.gif', '*.bmp')
 img_dir = './img/'
 paddleOcr = None
@@ -47,15 +53,15 @@ def detectByPaddle(img_path, ocr):
   filter_paddle = [
     (text, coords) 
     for text, coords in tmp 
-    if any(target in text for target in pfc_label)
+    if any(target in text for target in csv_label)
   ]
   pfc_value = []
   for detect in filter_paddle:
     near = findNearestText(detect, tmp)
-    if detect[0] == today_label:
-      result = near[0]
-    else:
+    if detect[0] in pfc_label:
       result = parseValue(near[0])
+    else:
+      result = near[0]
 
     pfc_value.append((detect[0], result))
 
@@ -79,11 +85,11 @@ def detectAllImg():
 
 def exportCsv(rows):
   print(rows)
-  with open('./csv/export.csv', mode='w', newline='', encoding='utf-8') as file:
+  with open(resultCsv, mode='w', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
     
     # ヘッダー行を書き込む
-    writer.writerow(pfc_label)
+    writer.writerow(csv_label)
     
     # 各行のデータを書き込む
     for row in rows:
@@ -91,8 +97,14 @@ def exportCsv(rows):
       row_data = [value for _, value in row]
       writer.writerow(row_data)
 
+  parseTOtalCalorie()
   print("CSVファイルに書き込みました。")
 
+def parseTOtalCalorie():
+  df = pd.read_csv(resultCsv)
+  df[['摂取', '最大cal']] = df[total_label].str.extract(r'(\d+)/(\d+)kca')
+  df = df.drop(columns=[total_label])
+  df.to_csv(resultCsv, index=False)
 
 print("*************** Paddle **************")
 detectAllImg()
