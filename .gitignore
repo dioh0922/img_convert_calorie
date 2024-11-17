@@ -2,3 +2,6 @@
 *.Identifier
 /python/img
 *.csv
+ext
+detect_img
+/python/*.png
