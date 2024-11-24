@@ -5,3 +5,6 @@
 ext
 detect_img
 /python/*.png
+/python/file/sample
+env/.env
+*.pyc
