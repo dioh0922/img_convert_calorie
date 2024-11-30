@@ -8,3 +8,4 @@ detect_img
 /python/file/sample
 env/.env
 *.pyc
+/python/file/result
