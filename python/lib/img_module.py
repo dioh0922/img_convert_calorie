@@ -2,6 +2,8 @@ import google.generativeai as genai
 import mimetypes
 import json
 import PIL.Image
+import os
+from datetime import datetime
 
 def loadRequestFile(path):
   mime_type, _ = mimetypes.guess_type(path)
@@ -25,3 +27,18 @@ def loadFile(path):
   with open(path, 'r', encoding='utf-8') as file:
     return file.read()
 
+def exportJson(text):
+  json_data = json.loads(text.replace('```json', '').replace('```', '').strip())
+  with open('./file/result/export' + datetime.now().strftime("%Y%m%d") + '.json', 'w', encoding='utf-8') as f:
+    json.dump(json_data, f, ensure_ascii=False, indent=4)
+
+def getImageFiles(directory):
+  image_extensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff']
+  image_files = []
+
+  for file_name in os.listdir(directory):
+    file_path = os.path.join(directory, file_name)
+    if os.path.isfile(file_path) and any(file_name.lower().endswith(ext) for ext in image_extensions):
+      image_files.append(file_path)
+
+  return image_files

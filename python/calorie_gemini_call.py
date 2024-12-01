@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 from pathlib import Path
 import mimetypes
 import json
+from datetime import datetime
+import re
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib')))
 
@@ -21,20 +23,29 @@ def main():
   load_dotenv(dotenv_path=env_file)
 
   parser = argparse.ArgumentParser(description="モード")
-  parser.add_argument('mode', type=str, choices=['txt', 'img', 'read', 'parse', 'drop', '?'], help='実行するモードを選択')
+  parser.add_argument('mode', type=str, choices=['txt', 'img', 'read', 'parse', 'drop', 'dump', '?'], help='実行するモードを選択')
   parser.add_argument('question', type=str, nargs='?', help='あなたの質問内容')
   parser.add_argument('files', type=str, nargs='*', help='List of files to process')
 
   # 引数を解析
   args = parser.parse_args()
-  if args.mode == 'read' and args.question is not None:
+
+  # 必須のチェック
+  if args.mode in ['txt', 'img', 'read']:
+    if not args.question:
+      parser.error('質問内容（question）が必要です。')
+
+  elif args.mode in ['parse', 'img', 'read']:
     if not args.files:
-      parser.error('ファイル選択は必須')
+      parser.error('処理するファイル（files）が必要です。')
+
+
+  if args.mode == 'read':
     fileCall(args.question, args.files)
-  if args.mode == 'parse':
-    if not args.files:
-      parser.error('ファイル選択は必須')
+  elif args.mode == 'parse':
     imgConvertJsonPrompt(args.files)
+  elif args.mode == 'dump':
+    imgConvertJsonDump()
   elif args.mode == 'drop':
     dropUploadFile()
   else:
@@ -71,14 +82,29 @@ def imgConvertJsonPrompt(files):
     else:
       continue
 
+  print(arr)
+
   prompt = 'format.jsonの形式に従って、画像からデータを抽出してください。結果にはjsonのみを含めてください。'
   print("トークン：" + gemini.calcToken(model, [prompt, *arr]))
   response = model.generate_content([prompt, *arr])
-  json_data = json.loads(response.text.replace('```json', '').replace('```', '').strip())
-  with open('./file/result/export.json', 'w', encoding='utf-8') as f:
-    json.dump(json_data, f, ensure_ascii=False, indent=4)
 
-  gemini.dropUploadFile()
+  json_pattern = r'```json\n(.*?)\n```'
+  match = re.search(json_pattern, response.text, re.DOTALL)
+
+  #print(response.text)
+  if match:
+    json_data = match.group(1)
+    print(json_data)
+      #print(response.text)
+    img.exportJson(json_data)
+    gemini.dropUploadFile()
+  else: print("JSON部分が見つかりませんでした。")
+
+
+def imgConvertJsonDump():
+  arr = img.getImageFiles('./img')
+  imgConvertJsonPrompt(arr)
+
 
 if __name__ == "__main__":
   main()
