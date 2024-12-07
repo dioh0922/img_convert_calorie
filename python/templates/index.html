@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Add User</title>
+</head>
+<body>
+  <form action="/request" method="post" enctype="multipart/form-data">
+    <input type="radio" name="mode" value="read" checked/>:画像アップ
+    <input type="radio" name="mode" value="parse"/>:JSON化
+    <input type="radio" name="mode" value="dump"/>:ダンプ解析
+    
+    <textarea name="prompt"></textarea>
+    <input type="file" name="file" accept="image/*"/>
+    <button type="submit">呼び出し</button>
+  </form>
+</body>
+</html>

@@ -7,7 +7,6 @@ from datetime import datetime
 
 def loadRequestFile(path):
   mime_type, _ = mimetypes.guess_type(path)
-  print(mime_type)
   if mime_type and mime_type.startswith('image'):
     return PIL.Image.open(path)
   elif mime_type and mime_type.startswith('audio'):

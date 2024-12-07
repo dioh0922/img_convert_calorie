@@ -17,36 +17,19 @@ import gemini_module as gemini
 model = None
 api_key = ''
 
-def main():
+def main(mode, question, files):
   script_dir = Path(__file__).parent
   env_file = script_dir.parent / 'env' / '.env'
   load_dotenv(dotenv_path=env_file)
 
-  parser = argparse.ArgumentParser(description="モード")
-  parser.add_argument('mode', type=str, choices=['txt', 'img', 'read', 'parse', 'drop', 'dump', '?'], help='実行するモードを選択')
-  parser.add_argument('question', type=str, nargs='?', help='あなたの質問内容')
-  parser.add_argument('files', type=str, nargs='*', help='List of files to process')
 
-  # 引数を解析
-  args = parser.parse_args()
-
-  # 必須のチェック
-  if args.mode in ['txt', 'img', 'read']:
-    if not args.question:
-      parser.error('質問内容（question）が必要です。')
-
-  elif args.mode in ['parse', 'img', 'read']:
-    if not args.files:
-      parser.error('処理するファイル（files）が必要です。')
-
-
-  if args.mode == 'read':
-    fileCall(args.question, args.files)
-  elif args.mode == 'parse':
-    imgConvertJsonPrompt(args.files)
-  elif args.mode == 'dump':
+  if mode == 'read':
+    fileCall(question, files)
+  elif mode == 'parse':
+    imgConvertJsonPrompt(files)
+  elif mode == 'dump':
     imgConvertJsonDump()
-  elif args.mode == 'drop':
+  elif mode == 'drop':
     dropUploadFile()
   else:
     print('invalid')
@@ -107,4 +90,21 @@ def imgConvertJsonDump():
 
 
 if __name__ == "__main__":
-  main()
+  parser = argparse.ArgumentParser(description="モード")
+  parser.add_argument('mode', type=str, choices=['img', 'read', 'parse', 'drop', 'dump', '?'], help='実行するモードを選択')
+  parser.add_argument('question', type=str, nargs='?', help='あなたの質問内容')
+  parser.add_argument('files', type=str, nargs='*', help='List of files to process')
+
+  # 引数を解析
+  args = parser.parse_args()
+
+    # 必須のチェック
+  if args.mode in ['img', 'read']:
+    if not args.question:
+      parser.error('質問内容（question）が必要です。')
+
+  elif args.mode in ['parse', 'img', 'read']:
+    if not args.files:
+      parser.error('処理するファイル（files）が必要です。')
+
+  main(args.mode, args.question, args.files)
