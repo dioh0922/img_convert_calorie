@@ -22,24 +22,27 @@ def api():
   prompt = request.form['prompt']
   file = request.files['file']
 
-  mime_type = mime.from_buffer(file.read())  # file.read() でファイルの内容を取得
-  file.seek(0)
-  allowed_mime_types = {
-    'image/jpeg': '.jpg',
-    'image/png': '.png',
-    'image/bmp': '.bmp',
-  }
-  if mime_type not in allowed_mime_types:
-    return jsonify({'error': 'Invalid file type'}), 400
-  
-  filename = file.filename
-  file_path = os.path.join('tmp', filename)
-  file.save(file_path)
+  file_path = ''
+  if mode != 'dump':
+    mime_type = mime.from_buffer(file.read())  # file.read() でファイルの内容を取得
+    file.seek(0)
+    allowed_mime_types = {
+      'image/jpeg': '.jpg',
+      'image/png': '.png',
+      'image/bmp': '.bmp',
+    }
+    if mime_type not in allowed_mime_types:
+      return jsonify({'error': 'Invalid file type'}), 400
+    
+    filename = file.filename
+    file_path = os.path.join('tmp', filename)
+    file.save(file_path)
 
-  main(mode, prompt, [file_path])
+  result = main(mode, prompt, [file_path])
   if os.path.exists(file_path):
     os.remove(file_path)
-  return mode + ':' + prompt + ':' + mime_type
+
+  return render_template('api_result.html', data=result)
 
 if __name__ == "__main__":
   app.run(debug=True)

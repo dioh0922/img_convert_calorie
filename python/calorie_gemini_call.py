@@ -24,15 +24,16 @@ def main(mode, question, files):
 
 
   if mode == 'read':
-    fileCall(question, files)
+    return fileCall(question, files)
   elif mode == 'parse':
-    imgConvertJsonPrompt(files)
+    return imgConvertJsonPrompt(files)
   elif mode == 'dump':
-    imgConvertJsonDump()
+    return imgConvertJsonDump()
   elif mode == 'drop':
-    dropUploadFile()
+    return dropUploadFile()
   else:
     print('invalid')
+    return 'invalid'
 
 def fileCall(q, files):
   model = gemini.initGemini()
@@ -45,11 +46,12 @@ def fileCall(q, files):
     else:
       continue
 
-  prompt = q
+  prompt = gemini.createPrompt(q)
   print("トークン：" + gemini.calcToken(model, [q, *arr]))
   response = model.generate_content([prompt, *arr])
   print(response.text)
   gemini.dropUploadFile()
+  return response.text
 
 def imgConvertJsonPrompt(files):
   model = gemini.initGemini()
@@ -81,12 +83,16 @@ def imgConvertJsonPrompt(files):
       #print(response.text)
     img.exportJson(json_data)
     gemini.dropUploadFile()
-  else: print("JSON部分が見つかりませんでした。")
+    return json_data
+  else: 
+    print("JSON部分が見つかりませんでした。")
+    return None
 
 
 def imgConvertJsonDump():
   arr = img.getImageFiles('./img')
-  imgConvertJsonPrompt(arr)
+  result = imgConvertJsonPrompt(arr)
+  return result
 
 
 if __name__ == "__main__":
