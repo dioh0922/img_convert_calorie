@@ -1,18 +1,61 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Add User</title>
-</head>
-<body>
-  <form action="/request" method="post" enctype="multipart/form-data">
-    <input type="radio" name="mode" value="read" checked/>:画像アップ
-    <input type="radio" name="mode" value="parse"/>:JSON化
-    <input type="radio" name="mode" value="dump"/>:ダンプ解析
-    
-    <textarea name="prompt"></textarea>
-    <input type="file" name="file" accept="image/*"/>
-    <button type="submit">呼び出し</button>
-  </form>
-</body>
-</html>
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<div class="mx-2 my-2">
+
+  <div id="loading" style="display: none;">
+    <div class="d-flex justify-content-center">
+      <div class="spinner-grow" role="status" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Loading...</span>
+      </div>  
+    </div>  
+  </div>
+
+  <div id="form-container">
+    <form id="myForm" action="/request" method="post" enctype="multipart/form-data">
+      <div class="row mb-2">
+
+        <div class="col-sm-3">
+          <input class="form-check" type="radio" name="mode" value="ask_one"/>画像に対して質問
+        </div>
+        
+        <div class="col-sm-3">
+          <input class="form-check" type="radio" name="mode" value="read" checked/>画像アップ
+        </div>
+
+        <div class="col-sm-3">
+          <input class="form-check" type="radio" name="mode" value="parse"/>JSON化
+        </div>
+        
+        <div class="col-sm-3">
+          <input class="form-check" type="radio" name="mode" value="dump"/>ダンプ解析
+        </div>
+      </div>
+      
+      <div class="form-group mb-2">
+        <textarea class="form-control" name="prompt" placeholder="問い合わせ内容"></textarea>
+      </div>
+
+      <div class="form-group mb-2">
+        <input class="form-control" type="file" name="file" accept="image/*"/>
+      </div>
+
+      <div class="form-group mb-2">
+        <button class="btn btn-primary" type="submit">呼び出し</button>
+      </div>
+    </form>
+  </div> 
+</div>
+
+<script>
+  // フォームが送信される前にフォームを非表示にしてローディングインジケーターを表示
+  document.getElementById('myForm').addEventListener('submit', function(event) {
+      // フォームを非表示
+      document.getElementById('form-container').style.display = 'none';
+      
+      // ローディングインジケーターを表示
+      document.getElementById('loading').style.display = 'block';
+  });
+</script>
+{% endblock %}

@@ -9,3 +9,4 @@ detect_img
 env/.env
 *.pyc
 /python/file/result
+/python/tmp

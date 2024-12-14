@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Add User</title>
-</head>
-<body>
-  <form action="/request" method="post" enctype="multipart/form-data">
-    <textarea readonly rows="100" cols="60">
+{% extends 'layout.html' %}
+
+{% block content %}
+
+  <form class="form-group" action="/request" method="post" enctype="multipart/form-data">
+    <textarea class="form-control" readonly rows="10" cols="100">
       {{data}}
     </textarea>
   </form>
-</body>
-</html>
+{% endblock %}
