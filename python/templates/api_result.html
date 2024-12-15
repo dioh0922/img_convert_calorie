@@ -1,10 +1,11 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-
+<div class="mx-2 my-2">
   <form class="form-group" action="/request" method="post" enctype="multipart/form-data">
     <textarea class="form-control" readonly rows="10" cols="100">
       {{data}}
     </textarea>
   </form>
+</div>
 {% endblock %}

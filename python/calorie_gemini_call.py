@@ -31,6 +31,8 @@ def main(mode, question, files):
     return imgConvertJsonDump()
   elif mode == 'drop':
     return dropUploadFile()
+  elif mode == 'ask':
+    return fileCall(question, files)
   else:
     print('invalid')
     return 'invalid'
@@ -105,11 +107,11 @@ if __name__ == "__main__":
   args = parser.parse_args()
 
     # 必須のチェック
-  if args.mode in ['img', 'read']:
+  if args.mode in ['img', 'read', 'ask']:
     if not args.question:
       parser.error('質問内容（question）が必要です。')
 
-  elif args.mode in ['parse', 'img', 'read']:
+  elif args.mode in ['parse', 'img', 'read', 'ask']:
     if not args.files:
       parser.error('処理するファイル（files）が必要です。')
 
