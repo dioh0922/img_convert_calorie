@@ -14,10 +14,6 @@ RUN apt-get install -y \
 RUN pip install --upgrade pip
 RUN pip install cython
 RUN pip install --upgrade setuptools pip
-RUN git clone https://github.com/yaml/pyyaml.git
-RUN cd pyyaml
-RUN python setup.py install
-
 
 RUN pip install wheel
 RUN pip install pandas
