@@ -10,6 +10,10 @@ RUN apt-get update && apt-get -y upgrade
 RUN apt-get install -y build-essential
 
 RUN pip install --upgrade pip
+RUN pip install cython
+RUN pip install --upgrade setuptools pip
+
+
 RUN pip install wheel
 RUN pip install pandas
 RUN pip install -r /usr/src/lib/requirements.txt
