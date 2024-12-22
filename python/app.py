@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from flask import Flask, render_template, request, url_for, redirect, jsonify
 from calorie_gemini_call import main
 import magic
