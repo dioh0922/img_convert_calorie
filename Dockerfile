@@ -16,6 +16,6 @@ RUN pip install --upgrade pip
 RUN pip install wheel
 RUN pip install pandas
 RUN pip install -r /usr/src/lib/requirements.txt
-RUN mkdir python/tmp && chmod 777 ./python/tmp
 COPY . .
+RUN mkdir python/tmp && chmod 777 ./python/tmp
 CMD ["flask", "run"]
