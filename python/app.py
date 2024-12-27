@@ -38,7 +38,7 @@ def api():
       return jsonify({'error': 'Invalid file type'}), 400
     
     filename = file.filename
-    file_path = os.path.join('tmp', filename)
+    file_path = os.path.join(os.path.dirname(__file__), 'tmp', filename)
     file.save(file_path)
 
   result = main(mode, prompt, [file_path])

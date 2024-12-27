@@ -2,7 +2,6 @@ import google.generativeai as genai
 import PIL.Image
 import sys, os
 import argparse
-from dotenv import load_dotenv
 from pathlib import Path
 import mimetypes
 
