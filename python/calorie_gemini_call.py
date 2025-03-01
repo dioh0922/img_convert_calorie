@@ -1,4 +1,3 @@
-import google.generativeai as genai
 import PIL.Image
 import sys, os
 import argparse
@@ -24,77 +23,19 @@ def main(mode, question, files):
 
 
   if mode == 'read':
-    return fileCall(question, files)
+    return 'deprecated'
+    #return gemini.fileCall(question, files)
   elif mode == 'parse':
-    return imgConvertJsonPrompt(files)
+    return gemini.imgConvertJsonPrompt(files)
   elif mode == 'dump':
-    return imgConvertJsonDump()
+    return gemini.imgConvertJsonDump()
   elif mode == 'drop':
-    return dropUploadFile()
+    return gemini.dropUploadFile()
   elif mode == 'ask':
-    return fileCall(question, files)
+    return gemini.fileCall(question, files)
   else:
     print('invalid')
     return 'invalid'
-
-def fileCall(q, files):
-  model = gemini.initGemini()
-  print(q)
-  arr = []
-  for path in files:
-    if os.path.exists(path):
-      target_file = img.loadRequestFile(path)
-      arr.append(target_file)
-    else:
-      continue
-
-  prompt = gemini.createPrompt(q)
-  print("トークン：" + gemini.calcToken(model, [q, *arr]))
-  response = model.generate_content([prompt, *arr])
-  print(response.text)
-  gemini.dropUploadFile()
-  return response.text
-
-def imgConvertJsonPrompt(files):
-  model = gemini.initGemini()
-  arr = []
-  with open('./file/template/format.json', 'r') as file:
-    content = file.read()
-    arr.append(content)
-  
-  for path in files:
-    if os.path.exists(path):
-      target_file = img.loadRequestFile(path)
-      arr.append(target_file)
-    else:
-      continue
-
-  print(arr)
-
-  prompt = 'format.jsonの形式に従って、画像からデータを抽出してください。結果にはjsonのみを含めてください。'
-  print("トークン：" + gemini.calcToken(model, [prompt, *arr]))
-  response = model.generate_content([prompt, *arr])
-
-  json_pattern = r'```json\n(.*?)\n```'
-  match = re.search(json_pattern, response.text, re.DOTALL)
-
-  #print(response.text)
-  if match:
-    json_data = match.group(1)
-    print(json_data)
-      #print(response.text)
-    img.exportJson(json_data)
-    gemini.dropUploadFile()
-    return json_data
-  else: 
-    print("JSON部分が見つかりませんでした。")
-    return None
-
-
-def imgConvertJsonDump():
-  arr = img.getImageFiles('./img')
-  result = imgConvertJsonPrompt(arr)
-  return result
 
 
 if __name__ == "__main__":
