@@ -29,10 +29,10 @@ def loadFile(path):
 
 def exportJson(text):
   base_dir = Path(__file__).parent
-  file_path = base_dir.parent / 'file' / 'result'
+  file_path = base_dir.parent / 'file' / 'result' / 'export' + datetime.now().strftime("%Y%m%d") + '.json'
 
   json_data = json.loads(text.replace('```json', '').replace('```', '').strip())
-  with open(file_path + '/export' + datetime.now().strftime("%Y%m%d") + '.json', 'w', encoding='utf-8') as f:
+  with open(file_path, 'w', encoding='utf-8') as f:
     json.dump(json_data, f, ensure_ascii=False, indent=4)
 
 def getImageFiles(directory):
