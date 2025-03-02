@@ -29,7 +29,8 @@ def loadFile(path):
 
 def exportJson(text):
   base_dir = Path(__file__).parent
-  file_path = base_dir.parent / 'file' / 'result' / 'export' + datetime.now().strftime("%Y%m%d") + '.json'
+  file_name = 'export' + datetime.now().strftime("%Y%m%d") + '.json'
+  file_path = base_dir.parent / 'file' / 'result' / file_name
 
   json_data = json.loads(text.replace('```json', '').replace('```', '').strip())
   with open(file_path, 'w', encoding='utf-8') as f:
