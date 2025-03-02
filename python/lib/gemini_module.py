@@ -1,29 +1,96 @@
-import google.generativeai as genai
+from google import genai
+#import google.generativeai as genai
 import PIL.Image
 import sys, os
 import argparse
 from pathlib import Path
 import mimetypes
+import re
 
 import img_module as img
 
+model_type = os.getenv("USE_GEMINI_MODEL", 'gemini-2.0-flash')
 
 def initGemini():
-  genai.configure(api_key=os.getenv('GEMINI_API'))
-  model_type = os.getenv("USE_GEMINI_MODEL", 'gemini-1.5-flash')
-  model = genai.GenerativeModel(model_type)
-  return model
+  return genai.Client(api_key=os.getenv('GEMINI_API'))
+
+def fileCall(q, files):
+  client = initGemini()
+  print(q)
+  arr = []
+  for path in files:
+    if os.path.exists(path):
+      target_file = img.loadRequestFile(path)
+      arr.append(target_file)
+    else:
+      continue
+
+  prompt = createPrompt(q)
+  request = [q, *arr]
+  print("トークン：" + calcToken(request))
+  response = client.models.generate_content(
+    model=model_type,
+    contents=request
+  )
+  print(response.text)
+  dropUploadFile()
+  return response.text
+
+def imgConvertJsonPrompt(files):
+  client = initGemini()
+  arr = []
+  with open('./file/template/format.json', 'r') as file:
+    content = file.read()
+    arr.append(content)
+  
+  for path in files:
+    if os.path.exists(path):
+      target_file = img.loadRequestFile(path)
+      arr.append(target_file)
+    else:
+      continue
+
+  print(arr)
+
+  prompt = 'format.jsonの形式に従って、それぞれの画像からデータを抽出してください。結果にはjsonのみを含めてください。複数ある場合は配列にしてすべて返してください。'
+  print("トークン：" + calcToken([prompt, *arr]))
+  response = client.models.generate_content(
+    model=model_type,
+    contents=[prompt, *arr]
+  )
+
+  # TODO: 複数ダンプの調整
+
+  json_pattern = r'```json\n(.*?)\n```'
+  match = re.search(json_pattern, response.text, re.DOTALL)
+
+  print(response.text)
+  if match:
+    json_data = match.group(1)
+    print(json_data)
+    img.exportJson(json_data)
+    dropUploadFile()
+    return json_data
+  else: 
+    print("JSON部分が見つかりませんでした。")
+    return None
+
+def imgConvertJsonDump():
+  arr = img.getImageFiles('./img')
+  result = imgConvertJsonPrompt(arr)
+  return result
 
 def dropUploadFile():
-  initGemini()
-  for file in genai.list_files():
+  client = initGemini()
+  for file in client.files.list():
     print(f"{file.display_name}, URI: {file.uri}')")
-    genai.delete_file(file.name)
+    client.files.delete(name=file.name)
     print(f'Deleted file {file.uri}')
 
 def createPrompt(q):
-  return q + "日本語で回答して"
+  return "日本語で回答して\n" + q
 
-def calcToken(model, request):
-  token_res = model.count_tokens(request)
-  return str(token_res.total_tokens)
+def calcToken(request):
+  client = initGemini()
+  response = client.models.count_tokens(model=model_type, contents=request)
+  return str(response.total_tokens)
