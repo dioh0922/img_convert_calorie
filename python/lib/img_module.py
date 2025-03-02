@@ -28,7 +28,7 @@ def loadFile(path):
     return file.read()
 
 def exportJson(text):
-    base_dir = Path(__file__).parent
+  base_dir = Path(__file__).parent
   file_path = base_dir.parent / 'file' / 'result'
 
   json_data = json.loads(text.replace('```json', '').replace('```', '').strip())
