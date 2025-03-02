@@ -39,7 +39,9 @@ def fileCall(q, files):
 def imgConvertJsonPrompt(files):
   client = initGemini()
   arr = []
-  with open('./file/template/format.json', 'r') as file:
+  base_dir = Path(__file__).parent
+  file_path = base_dir.parent / 'file' / 'template' / 'format.json'
+  with open(file_path, 'r') as file:
     content = file.read()
     arr.append(content)
   
